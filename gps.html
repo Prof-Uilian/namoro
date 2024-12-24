@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Locator</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #arrow {
+            width: 100px;
+            height: 100px;
+            background: url('arrow.png') no-repeat center;
+            background-size: contain;
+            transform: rotate(0deg);
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        #message.reached {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="arrow"></div>
+    <div id="message">Procurando localização...</div>
+    <script>
+        const destination = { lat: -23.5505, lon: -46.6333 }; // Coordenadas do destino
+        const tolerance = 10; // Tolerância de proximidade em metros
+
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+            const toRad = deg => deg * (Math.PI / 180);
+            const y = Math.sin(toRad(lon2 - lon1)) * Math.cos(toRad(lat2));
+            const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+                      Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(toRad(lon2 - lon1));
+            return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const toRad = deg => deg * (Math.PI / 180);
+            const R = 6371e3; // Raio da Terra em metros
+            const φ1 = toRad(lat1), φ2 = toRad(lat2);
+            const Δφ = toRad(lat2 - lat1), Δλ = toRad(lon2 - lon1);
+            const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function updateDirection(position) {
+            const currentLat = position.coords.latitude;
+            const currentLon = position.coords.longitude;
+            const distance = haversine(currentLat, currentLon, destination.lat, destination.lon);
+
+            const messageDiv = document.getElementById('message');
+            const arrowDiv = document.getElementById('arrow');
+
+            if (distance <= tolerance) {
+                messageDiv.textContent = "Você chegou ao destino!";
+                messageDiv.classList.add('reached');
+                return;
+            }
+
+            const bearing = calculateBearing(currentLat, currentLon, destination.lat, destination.lon);
+            arrowDiv.style.transform = `rotate(${bearing}deg)`;
+            messageDiv.textContent = `Distância: ${Math.round(distance)} metros`;
+        }
+
+        function startTracking() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updateDirection, error => {
+                    console.error(error);
+                    document.getElementById('message').textContent = "Erro ao obter localização.";
+                });
+            } else {
+                document.getElementById('message').textContent = "Geolocalização não suportada.";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', startTracking);
+    </script>
+</body>
+</html>
