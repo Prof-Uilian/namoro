@@ -36,7 +36,7 @@
     <div id="message">Procurando localização...</div>
     <script>
         const destination = { lat: -25.206217839471325, lon: -49.32366339094033 }; // Coordenadas do destino  -25.206217839471325, -49.32366339094033
-        const tolerance = 5 ; // Tolerância de proximidade em metros
+        const tolerance = 1 ; // Tolerância de proximidade em metros
 
         function calculateBearing(lat1, lon1, lat2, lon2) {
             const toRad = deg => deg * (Math.PI / 180);
@@ -64,7 +64,7 @@
             const arrowDiv = document.getElementById('arrow');
 
             if (distance <= tolerance) {
-                messageDiv.textContent = "Você chegou ao destino!";
+                messageDiv.textContent = "Você chegou ! 😊😊😊";
                 messageDiv.classList.add('reached');
                 return;
             }
