@@ -78,7 +78,7 @@ submitBtn.addEventListener("click", () => {
     currentQuestionIndex++;
     setTimeout(loadQuestion, 1000); // Avança para a próxima pergunta após 1 segundo
   } else {
-    feedback.textContent = "Resposta incorreta. Tente novamente.";
+    feedback.textContent = "Resposta incorreta. Caso feche o navegador, ele vai auto destruir a mensagem.";
     feedback.style.color = "red";
   }
 });
